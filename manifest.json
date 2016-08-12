@@ -15,11 +15,11 @@
     }
   },
 
-  "permissions": ["contextMenus", "storage", "notifications",  "webRequest", "<all_urls>"],
+  "permissions": ["tabs","contextMenus", "storage", "notifications",  "webRequest", "<all_urls>"],
 
-  "background": {
-        "scripts": ["training_data.js","script.js","training.js", "background_test.js", "probability.js"]
-  },
+  "background": { 
+    "scripts": ["training_data.js","script.js","training.js", "background_test.js", "probability.js"]
+ },
 
   "content_scripts": [
     {

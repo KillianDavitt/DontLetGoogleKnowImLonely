@@ -46,23 +46,45 @@ function average(nums){
 function probe()
 {
 	var xmlHttp = new XMLHttpRequest();
-	var theUrl = "https://www.google.ie/?gws_rd=ssl#q=causes+and+symptoms";
-	xmlHttp.open( "GET", theUrl, true ); // false for synchronous request
-    xmlHttp.withCredentials = true;
+	var theUrl = "https://www.google.ie/?gws_rd=ssl#q=hotels";
+	xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+    //xmlHttp.withCredentials = true;
 	xmlHttp.send();
 	notify({'url':'Made a probe'});
+    var i = 0;
+    while(i<1000){
+        var q = i * i * i * i * i;
+        i++;
+    }
 	if (xmlHttp.readyState==4 && xmlHttp.status==200){
 		parser = new DOMParser();
 		doc = parser.parseFromString(xmlHttp.responseText, "text/html");
-        ads = doc.getElementsByClassName("ads-ad");
-        notify({'url':ads.length});
+        var iframe = document.createElement('iframe');
+        //iframe.style.display = "none";
+        iframe.src = "www.google.ie";
+        document.body.appendChild(iframe);
+        /*document = doc;
+        document.head = doc.head;
+        document.title = doc.title;
+        
+        document = Object.assign({}, doc);
+        */
+		/*var all = doc.getElementsByTagName("*");
+
+		for (var i=0; i < all.length; i++) {
+			document.appendChild(all[i]);
+		}*/
+        //location.reload();
+        ads = document.getElementsByClassName("ads-ad");
+        notify({'url':String(ads.length)});
         processed_ads = processAds(ads);
         var [row_probs, col_probs] = getProbs();
         var pri_arr = [];
         for (var ad of processed_ads) {
             pri_arr.push(getPRI(ad, row_probs, col_probs));
         }
-
+        
         notify({"url":average(pri_arr)});
-	}
+        notify({'url': document.head});
+}
 }
