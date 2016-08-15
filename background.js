@@ -1,8 +1,17 @@
 training();
-function test(){
-    console.log("Test");
-}
 
+chrome.runtime.onMessage.addListener(send_training_data);
+
+pageWorker = require("sdk/page-worker").Page({
+  contentScript: "console.log(document.body.innerHTML);",
+    contentURL: "http://en.wikipedia.org/wiki/Internet"
+    });
+
+
+function send_training_data(message){
+
+    chrome.tabs.sendMessage(message={'labels' : labels, 'keywords' : keywords, 'count_matrix' : count_matrix});
+}
 
 function notify(message) {
     console.log("Creating a notification....");
@@ -14,18 +23,6 @@ function notify(message) {
   });
 }
 
-//chrome.runtime.onMessage.addListener(notify);
-
-
-notify({'url':'before request'});
-console.log("Starting...");
-var xmlHttp = new XMLHttpRequest();
-var theUrl = "https://www.google.ie";
-xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
-xmlHttp.send();
-notify({'url':'After request'});
-
-notify({'url': String(xmlHttp.responseText)});
 
 
 setInterval(function() { probe();}, 50000);
