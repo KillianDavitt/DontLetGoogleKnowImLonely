@@ -8,5 +8,4 @@ Continuing to develop the code started by: (Cristiano)[https://github.com/guimar
 
 ## TODO
 
-- [ ] Test
-- [x] Make a test
+- [ ] Make probe queries function in the background
