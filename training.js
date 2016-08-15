@@ -1,25 +1,71 @@
 // Global variables
 var keywords = [];
-var count_matrix = [];
 var labels = ["sensitive", "other"];
-
-function training() {
+var count_matrix = [];
+var training_data = [];
+/**
+ * Performs the training part of the application.
+ * Initializes the variables that contain the keywords,
+ * training data and count matrix.
+ */
+/**
+ * Performs the training part of the application: initializes the variables 
+ * that contain the keywords, training data and count matrix.
+ * @param  {Boolean} first_training  Indicates if this is the first time training
+ *                                   is performed; defaults to true.
+ */
+function training(first_training = true) {
+    /**/console.log("function training...\n");
+    if (first_training) {
+        localStorage.clear();
+        localStorage.setItem("training_data", training_data_str_);
+        training_data_str = training_data_str_;
+    } else {
+        training_data_str = localStorage.getItem("training_data");
+    }
     // Split the training data into individual ads with a label and some text
-    var training_data = splitTrainingData(training_data_str);
-
+    training_data = splitTrainingData(training_data_str);
     // Create a list of keywords and a dictionary
-    // [keywords, dict] = buildDictionary(training_data);  // OBS.: dict is not being used
     keywords = buildDictionary(training_data);
-    /**/console.log("Keywords ("+ keywords.length + "):"); console.log(keywords);
-    // /**/console.log("\nDICTIONARY:"); console.log(dict);
-
     // Create count matrix
-    init(labels, training_data);
-    /**/console.log("Count Matrix:");console.log(count_matrix);
-    /**/console.log("----------------");
+    createCountMatrix(labels, training_data);
+    // Save training variables to local storage
+    localStorage.setItem("labels", serializeArray(labels));
+    localStorage.setItem("keywords", serializeArray(keywords));
+    localStorage.setItem("count_matrix", serializeMatrix(count_matrix));
+    /**/console.log("# Keywords = %i\n\n",keywords.length);
+}
+/**
+ * Loads previous instances of the training variables from the local storage.
+ */
+function loadTraining() {
+    /**/console.log("function loadTraining\n");
+    // Get training variables from local storage, if the exist
+    try {
+        var labels_str = localStorage.getItem("labels");
+        var keywords_str = localStorage.getItem("keywords");
+        var matrix_str = localStorage.getItem("count_matrix");
+        // Convert variables to the original structures
+        labels = deserializeStrArray(labels_str);
+        keywords = deserializeStrArray(keywords_str);
+        count_matrix = deserializeMatrix(matrix_str);
+        /**/console.log("# Keywords = %i\n\n", keywords.length);
+    } catch(e) {
+        console.error(e);
+    }
+}
+/**
+ * Checks if the training has already been performed.
+ * @return {boolean} True if already trained; false otherwise.
+ */
+function checkTraining() {
+    var is_trained = localStorage.getItem("keywords") != null
+                     && localStorage.getItem("labels") != null
+                     && localStorage.getItem("count_matrix") != null;
+    /**/console.log("is_trained =", is_trained);
+    return is_trained;
 }
 /* -------------------------- Main Functions -------------------------- */
-
 /**
  * Splits the training data into an array of individual adverts.
  * Each advert consists of an array containing a label and some text.
@@ -28,71 +74,65 @@ function training() {
  */
 function splitTrainingData(training_data) {
     // Split adverts (delimited by ';')
-    training_data = training_data.split(';');
+    training_data = training_data.split(';').slice(0, -1);  // "slice" removes extra ';' at the end of the string
     var training_data_ = [];
-
     for (var i = 0; i < training_data.length; i++) {
         // Separate label and advert text (delimited by '::')
         training_data_[i] = training_data[i].split('::');
-
         // Tokenise advert text
         training_data_[i][1] = tokeniseText(training_data_[i][1]);
         training_data_[i][1] = (training_data_[i][1]).join(' ');
     }
     return training_data_;
 }
-
+/**
+ * Includes and advert in the training data.
+ * @param {Array}  ad_txt  Array containing the advert text.
+ * @param {String} label   Advert label.
+ */
+function addTrainingData(ad_txt, label) {
+    var ad_data = label + ':: ' + ad_txt.join(' ') + ';';
+    
+    // Add advert to training data
+    var old_training = localStorage.getItem("training_data");
+    var new_training = old_training + ad_data;
+    localStorage.setItem("training_data", new_training);
+    // Redo training
+    training(false);
+    // TODO: maybe add a counter to do training again only after adding 'n' new ads
+}
 /**
  * Creates a list of unique keywords appearing in the adverts.
  * @param  {Array} training_data  Training data.
  * @return {Array}                List of keywords found in training data.
  */
 function buildDictionary(training_data) {
-    // OBS.: dict is not being used
-
     var words = getKeywords(training_data);
-
-    // Count number of occurrences of each word
-    var keywords, count, dict = {};
-    [keywords, count] = getUniqueWords(words);
-    // /**/console.log(keywords);
-
-    for (var i = 0; i < keywords.length; i++) {
-        dict[keywords[i]] = count[i];
-    }
-    // return [keywords, dict];
-    return keywords
+    // Remove repeated words
+    var keywords = getUniqueWords(words);
+    return keywords;
 }
-
 /**
  * Creates a count matrix using the training data
  * @param  {Array} labels    List of advert labels.
  * @param  {Array} ad_texts  Training data.
  */
-function init(labels, ad_texts) {
+function createCountMatrix(labels, ad_texts) {
     var matrix = [];
     var ad_label = '';
-
     // Initialize empty count matrix
-    initCountMatrix(labels.length, keywords.length);
-
+    initMatrix(labels.length, keywords.length);
     // Update count matrix using the training data
     for (var ad of ad_texts) {
         ad_label = getAdLabel(ad)
         tokens = ad[1].split(' ');
         // Update count matrix
         for (var token of tokens) {
-            // This will be used when the training data is expanded
-            if(!findKeyword(token)) {
-                addKeyword(token);
-            }
             updateCountMatrix(token, ad_label);
         }
     }
 }
-
 /* -------------------------- Other functions -------------------------- */
-
 /**
  * Gets all the keywords found in the advert texts.
  * @param  {Array} training_data  Training data.
@@ -100,47 +140,37 @@ function init(labels, ad_texts) {
  */
 function getKeywords(training_data) {
     var keywords = '';
-
     for (var i = 0; i < training_data.length - 1; i++) {
         keywords += ((training_data[i])[1]) + ' ';      // String
     }
     // Don't add blank character at the end of the string
     keywords += ((training_data[training_data.length - 1])[1]);
-
     // Convert string to array of keywords
     keywords = keywords.split(' '); 
-
     return keywords;
 }
-
 /**
  * Gets the unique words found in an array.
- * @param  {Array}       arr  List of words.
- * @return {Array,Array}      List of unique words and the corresponding
- *                            number of occurrences.
+ * @param  {Array} arr  List of words.
+ * @return {Array}      List of unique words found in arr.
  */
 function getUniqueWords(arr) {
-        var words = [], count = [], prev;
+        var words = [], prev;
         arr.sort();
-
         for (var i = 0; i < arr.length; i++ ) {
             if (arr[i] !== prev) {
                 words.push(arr[i]);
-                count.push(1);
-            } else {
-                count[count.length-1]++;
             }
             prev = arr[i];
         }
-        return [words, count];
+        return words;
 }
-
 /**
  * Initializes the count matrix (2d array) and sets all values to 0.
  * @param  {Number} len_labels    Number of labels.
  * @param  {Number} len_keywords  Number of keywords.
  */
-function initCountMatrix(len_labels, len_keywords) {
+function initMatrix(len_labels, len_keywords) {
     // First dimension: labels.
     // Second dimension: keywords.
     for (var i = 0; i < len_labels; i++) {
@@ -152,7 +182,6 @@ function initCountMatrix(len_labels, len_keywords) {
         }
     }
 }
-
 /**
  * Increments the count matrix element corresponding
  * to a keyword and a label.
@@ -162,10 +191,8 @@ function initCountMatrix(len_labels, len_keywords) {
 function updateCountMatrix(keyword, label) {
     var keyword_index = keywords.indexOf(keyword); 
     var label_index = labels.indexOf(label);
-
     count_matrix[label_index][keyword_index]++;
 }
-
 /**
  * Gets the label that corresponds to an advert.
  * @param  {Array} ad  Advert from the training data.
@@ -173,50 +200,12 @@ function updateCountMatrix(keyword, label) {
  */
 function getAdLabel(ad) {
     // TODO: change labels
-
     // Use random condition
     if (ad[1].length % 2) {
         return "sensitive";
     } else {
         return "other";
     }
-
     // Use "location" as a non-sensitive topic
     // return (ad[0] == "location")?"other":"sensitive";
-}
-
-/**
- * Checks if the word given is in the list of keywords.
- * @param  {String}  word  Word being searched.
- * @return {Boolean}       True if word is found; false otherwise.
- */
-function findKeyword(word) {
-    return (keywords.indexOf(word) != -1);
-}
-
-/**
- * Adds a new keyword to the list of keywords and
- * allocates a new column in the count matrix.
- * @param {String} word  Word to be added to the list.
- */
-function addKeyword(word) {
-    // Add new word to the list
-    keywords.push(word);
-
-    // Allocate column in the count matrix
-    count_matrix[1].push([[0],[0]]);
-    count_matrix[0].push([[0],[0]]);
-}
-
-/**
- * Gets number of occurrences of a keyword and a label in the count matrix.
- * @param  {String} keyword  Keyword.
- * @param  {String} label    Label.
- * @return {Number}          Number of occurrences of the keyword and the label.
- */
-function getCount(keyword, label) {
-    var keyword_index = keywords.indexOf(keyword);
-    var label_index = labels.indexOf(label);
-    
-    return count_matrix[label_index][keyword_index];
 }
