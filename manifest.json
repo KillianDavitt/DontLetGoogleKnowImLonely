@@ -1,31 +1,29 @@
 {
   "manifest_version": 2,
-  "name": "Privacy addon",
+  "name": "PrivAddon",
   "version": "0.0.1",
-
   "description": "Informs the user when Google learns something about them.",
   "icons": {
     "48": "icons/icon-48.png"
   },
-
   "applications": {
     "gecko": {
       "id": "privaddon@local",
       "strict_min_version": "45.0"
     }
   },
-
-  "permissions": ["tabs","contextMenus", "storage", "notifications",  "webRequest", "<all_urls>"],
-
+  "permissions": ["tabs","contextMenus", "storage", "notifications", "webRequest", "<all_urls>"],
+  
   "background": { 
     "scripts": ["training_data.js","script.js","training.js", "background_test.js", "probability.js"]
- },
+  },
+
 
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["script.js", "probability.js", "index.js"]
+      "matches": [""],
+      "js": ["training_data.js", "training.js", "probability.js", "learning.js", "serialize.js", "deserialize.js", "ad_processing.js", "index.js"]
     }
   ]
-
 }
+
