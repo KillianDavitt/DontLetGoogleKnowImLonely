@@ -9,3 +9,8 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 ## TODO
 
 - [ ] Make probe queries function in the background
+
+## Timeline
+
+
+- 16/08/16 - Moved back to WebExtensions, ad retrieval in the background working. Changing of ads based on prior google searches does not seem to be working.
