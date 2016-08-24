@@ -8,7 +8,8 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 
 ## TODO
 
-- [ ] Make probe queries function in the background
+- [x] Make probe queries function in the background
+- [ ] Make the sensetive/non sensitive bits work
 
 ## Timeline
 
