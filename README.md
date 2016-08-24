@@ -15,3 +15,5 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 
 
 - 16/08/16 - Moved back to WebExtensions, ad retrieval in the background working. Changing of ads based on prior google searches does not seem to be working.
+- 23/08/16 -  Retrieval of adapted ads now working, cookie issues solved.
+- 24/08/16 -  Brainstorming how to display the data to the user, with some sort of graph
