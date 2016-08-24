@@ -13,8 +13,9 @@ function notify(message) {
     console.log("Creating a notification....");
     chrome.notifications.create({
     "type": "basic",
-    "iconUrl": chrome.extension.getURL("link.png"),
-    "title": "You clicked a link!",
+    "iconUrl": "http://www.google.com/favicon.ico",
+    "title": "Notification",
+    "priority": 1,
     "message": message.url
   });
 }
@@ -39,9 +40,9 @@ function average(nums){
 function probe()
 {
 	var xmlHttp = new XMLHttpRequest();
-	var theUrl = "http://www.google.com/search?hl=en&q=symptoms";
+	var theUrl = "http://www.google.com/search?hl=en&q=causes+and+symptoms";
 	xmlHttp.open( "GET", theUrl); // false for synchronous request
-    //xmlHttp.withCredentials = true;
+    xmlHttp.withCredentials = true;
 	xmlHttp.send();
 	notify({'url':'Made a probe'});
     var i = 0;
@@ -49,21 +50,20 @@ function probe()
         var q = i * i * i * i * i;
         i++;
     }
-	if (xmlHttp.readyState==4 && xmlHttp.status==200){
-		parser = new DOMParser();
-		doc = parser.parseFromString(xmlHttp.responseText, "text/html");
-        ads = doc.getElementsByClassName("ads-ad");
-        notify({'url':String(ads.length)});
-        processed_ads = processAds(ads);
-        var [row_probs, col_probs] = getProbs();
-        var pri_arr = [];
-        for (var ad of processed_ads) {
-            pri_arr.push(getPRI(ad, row_probs, col_probs));
-        }
-        
-        notify({"url":String(average(pri_arr))});
-        for (ad in processed_ads) {
-            notify({"url":ad[0].textContent});
+	xmlHttp.onreadystatechange = function(){
+        if (xmlHttp.readyState == 4) {
+            parser = new DOMParser();
+            doc = parser.parseFromString(xmlHttp.responseText, "text/html");
+            ads = doc.getElementsByClassName("ads-ad");
+            notify({'url':"Num ads: " + String(ads.length)});
+            processed_ads = processAds(ads);
+            var [row_probs, col_probs] = getProbs();
+            var pri_arr = [];
+            for (var ad of processed_ads) {
+                pri_arr.push(getPRI(ad, row_probs, col_probs));
+            }
+            
+            notify({"url": "Average PRI: " + String(average(pri_arr))});
         }
     }
 }

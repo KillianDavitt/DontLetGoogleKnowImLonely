@@ -15,7 +15,14 @@
     }
   },
 
-  "permissions": ["tabs", "contextMenus", "storage", "notifications",  "webRequest", "<all_urls>"],
+  "browser_action": {
+    "default_icon": "Icons/icon-48.png",
+    "default_title": "History",
+    "default_popup": "popup/history.html"
+  },
+ 
+
+  "permissions": ["cookies", "tabs", "contextMenus", "storage", "notifications",  "webRequest", "<all_urls>", "https://cdnjs.cloudflare.com/*"],
 
   "background": { 
     "scripts": ["serialize.js", "ad_processing.js", "training_data.js", "training.js", "learning.js", "background.js", "probability.js"]
