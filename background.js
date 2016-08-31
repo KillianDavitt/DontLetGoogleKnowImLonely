@@ -1,11 +1,18 @@
 training();
-
+var pri_history = [];
 chrome.runtime.onMessage.addListener(send_training_data);
 
-
+chrome.storage.local.set({ ['test'] : 'bod' }, function() {
+	  console.log("Stored");
+});
 
 function send_training_data(message){
-
+    if (message.search('get_pri') != -1){
+        chrome.runtime.sendMessage('pri_history: ' + String(pri_history), function(response) {
+            console.log('sendResponse was called with: ' + response);
+         });
+        return; 
+    }
     chrome.tabs.sendMessage(message={'labels' : labels, 'keywords' : keywords, 'count_matrix' : count_matrix});
 }
 
@@ -22,7 +29,7 @@ function notify(message) {
 
 
 
-setInterval(function() { probe();}, 50000);
+setInterval(function() { probe();}, 30000);
 
 function average(nums){
     var total = 0;
@@ -46,6 +53,7 @@ function probe()
 	xmlHttp.send();
 	notify({'url':'Made a probe'});
     var i = 0;
+    // naive delay, most likely can be removed
     while(i<1000){
         var q = i * i * i * i * i;
         i++;
@@ -64,6 +72,15 @@ function probe()
             }
             
             notify({"url": "Average PRI: " + String(average(pri_arr))});
+            pri_history.push(average(pri_arr));
+            chrome.runtime.sendMessage('pri_history: ' + String(pri_history), function(response) {
+                console.log('sendResponse was called with: ' + response);
+            });
         }
     }
 }
+
+
+chrome.storage.local.get('test', function(result) {
+	console.log(result);  
+})
