@@ -20,3 +20,4 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 - 23/08/16 - Investigated browser actions (the button on the top chrome bar) have ability to display any html there. HAve had success with Chart.js
 - 24/08/16 -  Brainstorming how to display the data to the user, with some sort of graph
 - 31/08/16 - Crude history graph is in place however, I have some difficulty ensuring that the graph stays up to date when the user closes the browser action and re-opens it.
+- 31/08/16 - In addition I am unsure of how the y axis of the graph should scale, is there a minimum and maximum pri? I don't think so.
