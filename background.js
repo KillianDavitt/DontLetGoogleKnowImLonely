@@ -66,11 +66,6 @@ function probe()
 	xmlHttp.send();
 	notify({'url':'Made a probe'});
     var i = 0;
-    // naive delay, most likely can be removed
-    while(i<1000){
-        var q = i * i * i * i * i;
-        i++;
-    }
 	xmlHttp.onreadystatechange = function(){
         if (xmlHttp.readyState == 4) {
             parser = new DOMParser();
@@ -89,6 +84,18 @@ function probe()
             chrome.runtime.sendMessage('pri_history: ' + String(pri_history), function(response) {
                 console.log('sendResponse was called with: ' + response);
             });
+            if(pri_history[pri_history.length -1] != -1){
+                loaded_pri_history = JSON.parse(localStorage.getItem('pri_history'));
+                var timestamp = String(Math.floor(Date.now() / 1000))
+                
+                if (loaded_pri_history == null){
+                    loaded_pri_history = JSON.parse('{"' + timestamp + '":" ' + String(pri_history[pri_history.length -1]) + '"}');
+                }
+                else {
+                    loaded_pri_history.push({timestamp : String(pri_history[pri_history.length -1])});
+                }
+                localStorage.setItem('pri_history', JSON.stringify(loaded_pri_history));
+            }
         }
     }
 }
@@ -97,3 +104,8 @@ function probe()
 chrome.storage.local.get('test', function(result) {
 	console.log(result);  
 })
+
+
+function fetch_pri_store() {
+    
+}

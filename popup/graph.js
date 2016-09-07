@@ -126,4 +126,7 @@ function draw_point(x,y, mult){
 
 redraw_graph();
 
-
+function fetch_data(){
+    full_history = localStorage.getItem('pri_history');
+    console.log(full_history);
+}
