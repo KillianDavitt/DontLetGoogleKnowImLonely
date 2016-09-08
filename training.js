@@ -17,7 +17,7 @@ var training_data = [];
 function training(first_training = true) {
     /**/console.log("function training...\n");
     if (first_training) {
-        localStorage.clear();
+        //localStorage.clear();
         localStorage.setItem("training_data", training_data_str);
         training_data_str = training_data_str;
     } else {

@@ -92,7 +92,7 @@ function probe()
                     loaded_pri_history = JSON.parse('{"' + timestamp + '":" ' + String(pri_history[pri_history.length -1]) + '"}');
                 }
                 else {
-                    loaded_pri_history.push({timestamp : String(pri_history[pri_history.length -1])});
+                    loaded_pri_history[timestamp] = String(pri_history[pri_history.length -1]);
                 }
                 localStorage.setItem('pri_history', JSON.stringify(loaded_pri_history));
             }

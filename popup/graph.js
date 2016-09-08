@@ -95,6 +95,8 @@ function addPri(time, pri){
 }
 
 function redraw_graph(pri_history){
+    
+    document.getElementById('export_button').onclick = fetch_data;
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
 
@@ -126,7 +128,18 @@ function draw_point(x,y, mult){
 
 redraw_graph();
 
+
+
 function fetch_data(){
     full_history = localStorage.getItem('pri_history');
-    console.log(full_history);
+    obj = JSON.parse(full_history);
+    for (var key in obj) {
+        var date_time = new Date(key * 1000);
+        var temp = obj[key];
+        delete obj[key]
+        obj[date_time] = temp;
+        
+    }
+    elem = document.getElementById('export_data');
+    elem.innerHTML = "<pre>" + JSON.stringify(obj, null, '\t') + "</pre>"
 }
