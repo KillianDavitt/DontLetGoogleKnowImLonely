@@ -11,7 +11,7 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 - [x] Make probe queries function in the background
 - [ ] Provide the data to the user in a sensible manner
 - [ ] Make the sensetive/non sensitive bits work
-- [ ] Allow export of results data
+- [x] Allow export of results data
 - [ ] Allow new categories
 
 # Estimation
@@ -30,4 +30,5 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 - 31/08/16 - In addition I am unsure of how the y axis of the graph should scale, is there a minimum and maximum pri? I don't think so.
 - 05/09/16 - Next task: Allow export of the data easily
 - 05/09/16 - Next task: Allow user to add categories of detection easily, by name, and then by clicking ads to add to the data
-
+- 08/09/16 - Reasonably effective exporting is now functioning properly
+- 09/09/16 - Trying to improve the graph display slightly by adding lines between points
