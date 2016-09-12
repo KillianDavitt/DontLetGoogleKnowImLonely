@@ -12,7 +12,8 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 - [ ] Provide the data to the user in a sensible manner
 - [ ] Make the sensetive/non sensitive bits work
 - [x] Allow export of results data
-- [ ] Allow new categories
+- [x] Allow new categories
+- [ ] Create multiple lines on the graph, one for each category
 
 # Estimation
 - 3 days for export, finished by thursday evening
@@ -32,3 +33,4 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 - 05/09/16 - Next task: Allow user to add categories of detection easily, by name, and then by clicking ads to add to the data
 - 08/09/16 - Reasonably effective exporting is now functioning properly
 - 09/09/16 - Trying to improve the graph display slightly by adding lines between points
+- 12/09/16 - Lots of work done. Categories can be added, and, ads can be clicked to be added to a users chosen category. The ad text is then added to the training data
