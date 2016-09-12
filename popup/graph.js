@@ -97,6 +97,8 @@ function addPri(time, pri){
 function redraw_graph(pri_history){
     
     document.getElementById('export_button').onclick = fetch_data;
+    document.getElementById('new_category_button').onclick = new_category;
+
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
 
@@ -106,11 +108,28 @@ function redraw_graph(pri_history){
 
     y_axis_multiplier = get_y_axis_multiplier(pri_history, y_axis_height);
 
+    ctx.beginPath();
     for(var i=0; i< pri_history.length; i++){
         if(280-(i*10)>=40){
             draw_point(i,pri_history[pri_history.length-1-i], y_axis_multiplier);
+            // Draw line between the points
+            // Move to previous point
+            ctx.moveTo(i-1, 300);
+            // Move to next point
+            ctx.lineTo(i,300 );
         }
     }
+    ctx.stroke();
+}
+
+function new_category(){
+    category_name = document.getElementById("new_category").value
+    categories = JSON.parse(localStorage.getItem("categories"))
+    if(categories == null){
+        categories = [];
+    }
+    categories.push(category_name);
+    localStorage.setItem("categories", JSON.stringify(categories));
 }
 
 function draw_point(x,y, mult){

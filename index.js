@@ -8,32 +8,58 @@ if (page_url.indexOf("google") != -1) {
         document.body.style.border = "2px solid red";
         console.log("Page is a google page...");
         
-        tab_index = document.activeElement.tabIndex;
-        chrome.runtime.sendMessage({'tabindex':tab_index});
-        
-        chrome.runtime.onMessage.addListener(main_ads);
 
+        ads = document.getElementsByClassName("ads-ad");
+
+        chrome.runtime.onMessage.addListener(
+            function(request, sender, sendResponse){
+                if(request.subject == "categories"){
+                    chrome.runtime.onMessage.removeListener(this);
+                    console.log(ads.length);
+                    categories = JSON.parse(request.categories);
+                    for (var i=0; i<ads.length; i++){
+                        console.log("Ad");
+                        var s = '<select><option value="null">Select a Category</option>'; // HTML string
+                        for(var j=0; j<categories.length; j++){
+                            s += '<option value="';
+                            s += categories[j];
+                            s += '">';
+                            s += categories[j];
+                            s += '</option>';
+                        }    
+                        
+                        s += "</select>";
+                        var btn = '<button class="category_add_button">Add to Category</button>'
+                        var div = document.createElement('div');
+                        div.innerHTML = s;
+                        ads[i].appendChild(div.childNodes[0]);
+                        div.innerHTML = btn
+                        ads[i].appendChild(div.childNodes[0]);
+
+                        button = div.childNodes[0];
+                        //button.onclick=add_ad();
+                        ads[i].childNodes[ads[i].childNodes.length-1].onclick = add_ad;
+
+                    }
+                }
+        });
+
+        chrome.runtime.sendMessage("request_categories") ;
 }
 
-function main_ads(message){
+function add_ad(){
+    console.log("Adding ad");
+    console.log(this.previousSibling.selectedIndex);
+    select = this.previousSibling;
+    name_of_category = select.options[select.selectedIndex].value;
+    console.log(name_of_category);
+    console.log(select.parent);
 
-        labels = message.labels;
-        keywords = message.keywords;
-        count_matrix = message.count_matrix;
+    // Clone the ad and remove what we added so we get an accurate processing of the ad text
+    elem = select.parentElement.cloneNode(true);
+    elem.removeChild(elem.childNodes[elem.childNodes.length-1]);
+    elem.removeChild(elem.childNodes[elem.childNodes.length-1]);
 
-        // Search button pressed (WORKS SOMETIMES)
-        var search_button = document.getElementsByClassName("lsb").item(0);
-        search_button.addEventListener("click", function() {
-            main();
-        });
-
-        // Return key pressed in search bar (WORKS SOMETIMES)
-        var search_bar = document.getElementById("lst-ib");
-        search_bar.addEventListener("keydown", function(event) {
-            if (event.key == "Enter")
-                main();
-        });
-
-        // TODO: listen to other events
-    
+    keywords = processAds([elem])
+    console.log("+" + name_of_category + "::" + keywords);
 }
