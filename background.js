@@ -7,6 +7,12 @@ chrome.storage.local.set({ ['test'] : 'bod' }, function() {
 });
 
 function send_training_data(message){
+    if(message.subject == "add_training_data"){
+        label = message.label;
+        keywords = message.keywords;
+        addTrainingData(keywords, label);
+        return;
+    }
     if (message == "request_categories"){
         categories = localStorage.getItem("categories");
         chrome.runtime.sendMessage("categ:" + categories);

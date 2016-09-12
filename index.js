@@ -61,5 +61,6 @@ function add_ad(){
     elem.removeChild(elem.childNodes[elem.childNodes.length-1]);
 
     keywords = processAds([elem])
+    chrome.runtime.sendMessage(message={subject:"add_training_data", label: name_of_category, keywords: keywords});
     console.log("+" + name_of_category + "::" + keywords);
 }

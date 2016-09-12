@@ -1,5 +1,13 @@
-var pri_history = [];
+var pri_history = {};
 
+
+// Pri history is a dict of arrays, containing the pri's for a given time for each category.
+categories = JSON.parse(localStorage.getItem("categories"));
+for( var i=0; i<categories.length; i++){
+    pri_history[categories[i]] = [];
+}
+
+// General listening function
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     if (message.search('get_pri') != -1){
         return;
