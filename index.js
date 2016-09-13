@@ -1,3 +1,5 @@
+window.onload = function(){
+
 // Fetch URL of the page
 var page_url = window.location.href;
 /**/console.log("Add-on loaded...\n\n\n");
@@ -9,12 +11,13 @@ if (page_url.indexOf("google") != -1) {
         console.log("Page is a google page...");
         
 
-        ads = document.getElementsByClassName("ads-ad");
 
         chrome.runtime.onMessage.addListener(
             function(request, sender, sendResponse){
                 if(request.subject == "categories"){
                     chrome.runtime.onMessage.removeListener(this);
+                    
+                    ads = document.getElementsByClassName("ads-ad");
                     console.log(ads.length);
                     categories = JSON.parse(request.categories);
                     for (var i=0; i<ads.length; i++){
@@ -44,9 +47,9 @@ if (page_url.indexOf("google") != -1) {
                 }
         });
 
-        chrome.runtime.sendMessage("request_categories") ;
+        chrome.runtime.sendMessage(message={subject:"request_categories"}) ;
 }
-
+};
 function add_ad(){
     console.log("Adding ad");
     console.log(this.previousSibling.selectedIndex);
@@ -64,3 +67,5 @@ function add_ad(){
     chrome.runtime.sendMessage(message={subject:"add_training_data", label: name_of_category, keywords: keywords});
     console.log("+" + name_of_category + "::" + keywords);
 }
+
+

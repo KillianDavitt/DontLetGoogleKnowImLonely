@@ -13,13 +13,13 @@ function send_training_data(message){
         addTrainingData(keywords, label);
         return;
     }
-    if (message == "request_categories"){
+    if (message.subject == "request_categories"){
+        // Artificial delay
+        for(var i=0; i<9999999; i++){}
         categories = localStorage.getItem("categories");
         chrome.runtime.sendMessage("categ:" + categories);
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {subject: "categories", categories: categories}, function(response) {
-                console.log("hi");
-            });
+            chrome.tabs.sendMessage(tabs[0].id, {subject: "categories", categories: categories});
         });
     }
     else if (message.search('get_pri') != -1){

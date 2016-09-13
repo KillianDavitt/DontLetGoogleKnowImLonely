@@ -1,6 +1,8 @@
 // Global variables
 var keywords = [];
+//var labels = JSON.parse(localStorage.getItem('categories'));
 var labels = ["sensitive", "other"];
+
 var count_matrix = [];
 var training_data = [];
 /**

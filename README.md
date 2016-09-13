@@ -34,3 +34,4 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 - 08/09/16 - Reasonably effective exporting is now functioning properly
 - 09/09/16 - Trying to improve the graph display slightly by adding lines between points
 - 12/09/16 - Lots of work done. Categories can be added, and, ads can be clicked to be added to a users chosen category. The ad text is then added to the training data
+- 13/09/16 - Much difficulty trying to get the ad options to consistently show up. It's totally sporadic, So far I have no solutions to this. window.onload is proving not useful and in fact seems to be making the problem worse
