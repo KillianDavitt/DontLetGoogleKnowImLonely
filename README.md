@@ -14,6 +14,7 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 - [x] Allow export of results data
 - [x] Allow new categories
 - [ ] Create multiple lines on the graph, one for each category
+- [ ] Show suggested labels on ads
 
 # Estimation
 - 3 days for export, finished by thursday evening
@@ -35,3 +36,4 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 - 09/09/16 - Trying to improve the graph display slightly by adding lines between points
 - 12/09/16 - Lots of work done. Categories can be added, and, ads can be clicked to be added to a users chosen category. The ad text is then added to the training data
 - 13/09/16 - Much difficulty trying to get the ad options to consistently show up. It's totally sporadic, So far I have no solutions to this. window.onload is proving not useful and in fact seems to be making the problem worse
+- 15/09/16 - Still have bug with ads not being detected when dev console is not open. New task to add the suggested label also.

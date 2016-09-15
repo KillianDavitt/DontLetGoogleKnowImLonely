@@ -1,12 +1,8 @@
 training();
 var pri_history = [];
-chrome.runtime.onMessage.addListener(send_training_data);
+chrome.runtime.onMessage.addListener(message_recv);
 
-chrome.storage.local.set({ ['test'] : 'bod' }, function() {
-	  console.log("Stored");
-});
-
-function send_training_data(message){
+function message_recv(message){
     if(message.subject == "add_training_data"){
         label = message.label;
         keywords = message.keywords;
@@ -14,15 +10,13 @@ function send_training_data(message){
         return;
     }
     if (message.subject == "request_categories"){
-        // Artificial delay
-        for(var i=0; i<9999999; i++){}
         categories = localStorage.getItem("categories");
         chrome.runtime.sendMessage("categ:" + categories);
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {subject: "categories", categories: categories});
         });
     }
-    else if (message.search('get_pri') != -1){
+    else if (message.subject('get_pri') != -1){
         var history = pri_history.slice();
 
         var i = 0;
@@ -58,17 +52,22 @@ setInterval(function() { probe();}, 30000);
 
 function average(nums){
     if (nums.length == 0) {
-        return -1
+        return [-1]
     }
-    var total = 0;
+    var total = [];
     var length = nums.length;
     var i = 0;
     while (i<length){
-        total += parseFloat(nums[i]);
+        total.push(0);
+        for(var j=0; j<nums[i].length; j++){
+            total[i] += parseFloat(nums[i][j]);
+        }
         i++;
     }
-
-    var average = total/length;
+    var average = []; 
+    for(var i=0; i<total.length; i++){
+        average.push = total[i]/nums[i].length;
+    }
     return average;
 }
 
@@ -92,11 +91,12 @@ function probe()
             var pri_arr = [];
             for (var ad of processed_ads) {
                 pri_arr.push(getPRI(ad, row_probs, col_probs));
+                console.log(pri_arr[pri_arr.length-1]);
             }
             
             notify({"url": "Average PRI: " + String(average(pri_arr))});
             pri_history.push(average(pri_arr));
-            chrome.runtime.sendMessage('pri_history: ' + String(pri_history), function(response) {
+            chrome.runtime.sendMessage(message={subject:'pri_history', pri_history: JSON.stringify(pri_history)}, function(response) {
                 console.log('sendResponse was called with: ' + response);
             });
             if(pri_history[pri_history.length -1] != -1){
@@ -104,7 +104,8 @@ function probe()
                 var timestamp = String(Math.floor(Date.now() / 1000))
                 
                 if (loaded_pri_history == null){
-                    loaded_pri_history = JSON.parse('{"' + timestamp + '":" ' + String(pri_history[pri_history.length -1]) + '"}');
+                    loaded_pri_history = {timestamp: String(pri_history[pri_history.length -1])}
+                    //loaded_pri_history = JSON.parse('{"' + timestamp + '":" ' + String(pri_history[pri_history.length -1]) + '"}');
                 }
                 else {
                     loaded_pri_history[timestamp] = String(pri_history[pri_history.length -1]);
@@ -114,11 +115,6 @@ function probe()
         }
     }
 }
-
-
-chrome.storage.local.get('test', function(result) {
-	console.log(result);  
-})
 
 
 function fetch_pri_store() {

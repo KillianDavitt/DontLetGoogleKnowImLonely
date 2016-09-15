@@ -1,4 +1,13 @@
-window.onload = function(){
+console.log(document.readyState);
+if(document.readyState == 'complete') {
+    console.log("Calling main...");
+    main();
+}
+
+
+window.addEventListener("load", main, false);
+
+function main(){
 
 // Fetch URL of the page
 var page_url = window.location.href;
@@ -6,50 +15,49 @@ var page_url = window.location.href;
 
 // Execute only on Google pages
 if (page_url.indexOf("google") != -1) {
-        // Debugging
-        document.body.style.border = "2px solid red";
-        console.log("Page is a google page...");
-        
+    document.body.style.border = "2px solid red";
+    console.log("Page is a google page...");
+    
 
 
-        chrome.runtime.onMessage.addListener(
-            function(request, sender, sendResponse){
-                if(request.subject == "categories"){
-                    chrome.runtime.onMessage.removeListener(this);
+    chrome.runtime.onMessage.addListener(
+        function(request, sender, sendResponse){
+            if(request.subject == "categories"){
+                chrome.runtime.onMessage.removeListener(this);
+                
+                ads = document.getElementsByClassName("ads-ad");
+                console.log(ads.length);
+                categories = JSON.parse(request.categories);
+                for (var i=0; i<ads.length; i++){
+                    console.log("Ad");
+                    var s = '<select><option value="null">Select a Category</option>'; // HTML string
+                    for(var j=0; j<categories.length; j++){
+                        s += '<option value="';
+                        s += categories[j];
+                        s += '">';
+                        s += categories[j];
+                        s += '</option>';
+                    }    
                     
-                    ads = document.getElementsByClassName("ads-ad");
-                    console.log(ads.length);
-                    categories = JSON.parse(request.categories);
-                    for (var i=0; i<ads.length; i++){
-                        console.log("Ad");
-                        var s = '<select><option value="null">Select a Category</option>'; // HTML string
-                        for(var j=0; j<categories.length; j++){
-                            s += '<option value="';
-                            s += categories[j];
-                            s += '">';
-                            s += categories[j];
-                            s += '</option>';
-                        }    
-                        
-                        s += "</select>";
-                        var btn = '<button class="category_add_button">Add to Category</button>'
-                        var div = document.createElement('div');
-                        div.innerHTML = s;
-                        ads[i].appendChild(div.childNodes[0]);
-                        div.innerHTML = btn
-                        ads[i].appendChild(div.childNodes[0]);
+                    s += "</select>";
+                    var btn = '<button class="category_add_button">Add to Category</button>'
+                    var div = document.createElement('div');
+                    div.innerHTML = s;
+                    ads[i].appendChild(div.childNodes[0]);
+                    div.innerHTML = btn
+                    ads[i].appendChild(div.childNodes[0]);
 
-                        button = div.childNodes[0];
-                        //button.onclick=add_ad();
-                        ads[i].childNodes[ads[i].childNodes.length-1].onclick = add_ad;
+                    button = div.childNodes[0];
+                    //button.onclick=add_ad();
+                    ads[i].childNodes[ads[i].childNodes.length-1].onclick = add_ad;
 
-                    }
                 }
+            }
         });
 
         chrome.runtime.sendMessage(message={subject:"request_categories"}) ;
+	}
 }
-};
 function add_ad(){
     console.log("Adding ad");
     console.log(this.previousSibling.selectedIndex);

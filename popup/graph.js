@@ -9,16 +9,16 @@ for( var i=0; i<categories.length; i++){
 
 // General listening function
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    if (message.search('get_pri') != -1){
+    if (message.subject('get_pri') != -1){
         return;
     }
-    if (message.search('pri_history') != -1){
+    if (message.subject('pri_history') != -1){
         arr = message.substr(12, message.length);
-        pri_history = JSON.parse("[" + arr + "]"); 
+        pri_history = JSON.parse(message.substr(13, message.length-1)); 
         redraw_graph(pri_history);
         return; 
     }
-    if (message.search('pri') != -1) {
+    if (message.subject('pri') != -1) {
         addPri(0, message.substr(5,message.length));
     }
 });
@@ -61,6 +61,7 @@ function get_y_axis_multiplier(pri_history, y_axis_height){
 
 
 function setupGraph(){
+
 
     // Y Axis height is equal to 
     // X axis is constant
@@ -116,15 +117,12 @@ function redraw_graph(pri_history){
 
     y_axis_multiplier = get_y_axis_multiplier(pri_history, y_axis_height);
 
-    ctx.beginPath();
     for(var i=0; i< pri_history.length; i++){
-        if(280-(i*10)>=40){
-            draw_point(i,pri_history[pri_history.length-1-i], y_axis_multiplier);
-            // Draw line between the points
-            // Move to previous point
-            ctx.moveTo(i-1, 300);
-            // Move to next point
-            ctx.lineTo(i,300 );
+        
+        for(var j=0; j<pri_history[i].length; j++){
+            if(280-(i*10)>=40){
+                draw_point(i,pri_history[pri_history-1-i][pri_history[pri_history-1-i].length-1-j], y_axis_multiplier);
+            }
         }
     }
     ctx.stroke();
