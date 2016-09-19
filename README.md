@@ -37,3 +37,4 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 - 12/09/16 - Lots of work done. Categories can be added, and, ads can be clicked to be added to a users chosen category. The ad text is then added to the training data
 - 13/09/16 - Much difficulty trying to get the ad options to consistently show up. It's totally sporadic, So far I have no solutions to this. window.onload is proving not useful and in fact seems to be making the problem worse
 - 15/09/16 - Still have bug with ads not being detected when dev console is not open. New task to add the suggested label also.
+- 19/09/16 - Did a lot of tidying of the code today, general cleaning up. Trying to get the graph working properly, i'm a bit closer but not there yet.
