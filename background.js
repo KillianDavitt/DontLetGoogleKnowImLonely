@@ -8,7 +8,15 @@
 // When we load the addon, do the training
 training();
 
-var pri_history = [];
+// Pri history is a dict of arrays, containing the pri's for a given time for each category.
+categories = JSON.parse(localStorage.getItem("categories"));
+
+var pri_history = {};
+// Declare each category as a list
+for( var i=0; i<categories.length; i++){
+    pri_history[categories[i]] = [];
+}
+
 
 // Add a listener
 chrome.runtime.onMessage.addListener(message_recv);
@@ -25,23 +33,12 @@ function message_recv(message){
         return;
     }
     else if (message.subject == "request_categories"){
-        categories = localStorage.getItem("categories");
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {subject: "categories", categories: categories});
+            chrome.tabs.sendMessage(tabs[0].id, {subject: "categories", categories: JSON.stringify(categories)});
         });
     }
     else if (message.subject == 'get_pri'){
-        var history = pri_history.slice();
-
-        var i = 0;
-        while(i<history.lenght){
-            if(String(history[i]) == "NaN"){
-                history[i] = -1;
-            }
-            i++;
-        }
-
-        chrome.runtime.sendMessage(message={subject:'pri_history', pri_history : String(history)});
+        chrome.runtime.sendMessage(message={subject:'pri_history', pri_history : JSON.stringify(pri_history)});
         return; 
     }
     chrome.tabs.sendMessage(message={'labels' : labels, 'keywords' : keywords, 'count_matrix' : count_matrix});
@@ -120,11 +117,23 @@ function probe()
             for (var ad of processed_ads) {
                 pri_arr.push(getPRI(ad, row_probs, col_probs));
             }
+            // I've gotten this backwards, pri_arr has an elem for each ad
+            // Transpose the arr
+
+			var pri_fixed = pri_arr[0].map(function(col, i) { 
+			  	return pri_arr.map(function(row) { 
+    				return row[i] 
+ 			 	})
+			});
+
             console.log(String(average(pri_arr))); 
             notify({"url": "Average PRI: " + String(average(pri_arr))});
             // Average pri_arr returns an array of floats.
             // We don't want to push this on, we kind of want to zip it on in a sense
-            pri_history.push(average(pri_arr));
+            avg_pri = average(pri_arr);
+            for(var i=0; i<categories.length; i++){
+                pri_history[categories[i]] = pri_history[categories[i]].concat(pri_fixed[i]);
+            }
 
             // Send the new array of pri's to the browser action.
             chrome.runtime.sendMessage(message={subject:'pri_history', pri_history: JSON.stringify(pri_history)});

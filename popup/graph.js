@@ -5,7 +5,8 @@
 
 
 var pri_history = {};
-
+var x_axis_height = 600;
+var y_axis_height = 300;
 
 // Pri history is a dict of arrays, containing the pri's for a given time for each category.
 categories = JSON.parse(localStorage.getItem("categories"));
@@ -87,34 +88,32 @@ function setupGraph(){
     // Y Axis height is equal to 
     // X axis is constant
     // Y axis multiplier = y axis height divided by range of pri_history
-    var y_axis_height = 200;
-    var x_axis_height = 200;
 
     y_axis_multiplier = get_y_axis_multiplier(pri_history, y_axis_height);
 
-    var c = document.getElementById("myCanvas");
-    var ctx = c.getContext("2d");
+    c = document.getElementById("myCanvas");
+    ctx = c.getContext("2d");
     ctx.fillStyle = "#FF0000";
 
     ctx.font = "20px Arial";
 
     ctx.moveTo(40,0);
-    ctx.lineTo(40,100);
+    ctx.lineTo(40,y_axis_height);
     ctx.stroke();
 
-    ctx.lineTo(280,100);
+    ctx.lineTo(x_axis_height, y_axis_height);
     ctx.stroke();
 
-    ctx.fillText("Time",140,160);
+    ctx.fillText("Time",x_axis_height + 40,y_axis_height);
     ctx.fillText("PRI",0,50);
-    ctx.fillText("Now", 260,140);
-    ctx.moveTo(280,125);
-    ctx.lineTo(280,110);
+    ctx.fillText("Now", x_axis_height - 20,y_axis_height + 25);
+    ctx.moveTo(x_axis_height,y_axis_height);
+    ctx.lineTo(x_axis_height,y_axis_height + 10);
     ctx.stroke();
 
-    ctx.fillText("-5 mins", 20,140);
-    ctx.moveTo(40,125);
-    ctx.lineTo(40,110);
+    ctx.fillText("-5 mins", 20,y_axis_height + 20);
+    ctx.moveTo(40,y_axis_height-10);
+    ctx.lineTo(40,y_axis_height);
     ctx.stroke();
 
 }
@@ -129,27 +128,32 @@ function redraw_graph(pri_history){
     document.getElementById('export_button').onclick = fetch_data;
     document.getElementById('new_category_button').onclick = new_category;
 
-    var c = document.getElementById("myCanvas");
-    var ctx = c.getContext("2d");
+    c = document.getElementById("myCanvas");
+    ctx = c.getContext("2d");
 
     ctx.clearRect(0, 0, c.width, c.height);
     setupGraph();
-    var y_axis_height = 200;
 
     y_axis_multiplier = get_y_axis_multiplier(pri_history, y_axis_height);
 
     // For all categories
-    for(var i=0; i< pri_history.length; i++){
-
-        curr_cat_arr = pri_history[i];
+    for(var key in pri_history){
+        
+        curr_cat_arr = pri_history[key];
+            //}
         // For all pri's in that category
-        for(var j=curr_cat_arr.length-1; j>=0; j--){
-             
-            // If the point goes off the x axis, don't draw
-            if(280-(i*10)>=40){
-                draw_point(i,curr_cat_arr[j], y_axis_multiplier);
-            }
+        ctx.strokeStyle = '#ff0000';
+        ctx.lineWidth=40;
+
+        ctx.beginPath();
+        ctx.moveTo(x_axis_height, curr_cat_arr[curr_cat_arr.length-1]);
+        for(var j=curr_cat_arr.length-2; j>=0; j--){
+            if(x_axis_height-(j*10) <= 40){
+                break;
+            } 
+            ctx.lineTo(x_axis_height - (j*10), curr_cat_arr[j]);
         }
+        ctx.stroke();
     }
 }
 
