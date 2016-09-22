@@ -11,6 +11,11 @@ training();
 // Pri history is a dict of arrays, containing the pri's for a given time for each category.
 categories = JSON.parse(localStorage.getItem("categories"));
 
+if(categories === null){
+    categories = JSON.parse("[]");
+    localStorage.setItem('categories', JSON.stringify(categories));
+}
+
 var pri_history = {};
 // Declare each category as a list
 for( var i=0; i<categories.length; i++){

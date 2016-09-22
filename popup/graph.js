@@ -3,6 +3,8 @@
     There is also functionality to export all of the data as well as adding new categories
 */
 
+var colors = ['#ffd700', '#0000ff', '#800080','#00ff00', '#81d8d0'];
+
 
 var pri_history = {};
 var x_axis_height = 600;
@@ -10,6 +12,11 @@ var y_axis_height = 300;
 
 // Pri history is a dict of arrays, containing the pri's for a given time for each category.
 categories = JSON.parse(localStorage.getItem("categories"));
+
+if(categories === null){
+    categories = JSON.parse("[]");
+    localStorage.setItem('categories', JSON.stringify(categories));
+}
 
 // Declare each category as a list
 for( var i=0; i<categories.length; i++){
@@ -63,20 +70,27 @@ function get_min(arr){
 function get_y_axis_multiplier(pri_history, y_axis_height){
     var pri_range =0;
     var max_pri=0;
-    for(var i=0; i< pri_history.length; i++){
-        new_max = get_max(pri_history[i]);
-        if (new_max > max_pri){
-            max_pri = new_max;
+    if(true || pri_history === null){
+        return y_axis_height / 2 ;
+    }
+    for(key in pri_history){
+        for(var i=0; i< pri_history[key].length; i++){
+            new_max = pri_history[key][i];
+            if (new_max > max_pri){
+                max_pri = new_max;
+            }
         }
     }
     var min_pri = 20;
-    for(var i=0; i<pri_history.length; i++){
-        new_min = get_min(pri_history[i]);
-        if(new_min < min_pri){
-            min_pri = new_min;
+    for(key in pri_history){
+        for(var i=0; i<pri_history[key].length; i++){
+            new_min = pri_history[key][i];
+            if(new_min < min_pri){
+                min_pri = new_min;
+            }
         }
     }
-    pri_range = max_pri - min_pri;
+    pri_range = Math.abs(max_pri - min_pri);
     var y_axis_multiplier = y_axis_height / pri_range;
     return y_axis_multiplier;
 }
@@ -94,7 +108,7 @@ function setupGraph(){
     c = document.getElementById("myCanvas");
     ctx = c.getContext("2d");
     ctx.fillStyle = "#FF0000";
-
+    ctx.lineWidth=1;
     ctx.font = "20px Arial";
 
     ctx.moveTo(40,0);
@@ -137,24 +151,32 @@ function redraw_graph(pri_history){
     y_axis_multiplier = get_y_axis_multiplier(pri_history, y_axis_height);
 
     // For all categories
+    n=0;
     for(var key in pri_history){
         
         curr_cat_arr = pri_history[key];
             //}
         // For all pri's in that category
-        ctx.strokeStyle = '#ff0000';
-        ctx.lineWidth=40;
+        ctx.strokeStyle = colors[n];
+        ctx.fillStyle = colors[n];
+        ctx.lineWidth=5;
+        
 
         ctx.beginPath();
-        ctx.moveTo(x_axis_height, curr_cat_arr[curr_cat_arr.length-1]);
+        ctx.moveTo(x_axis_height, y_axis_height - (y_axis_multiplier * curr_cat_arr[curr_cat_arr.length-1]));
         for(var j=curr_cat_arr.length-2; j>=0; j--){
             if(x_axis_height-(j*10) <= 40){
                 break;
             } 
-            ctx.lineTo(x_axis_height - (j*10), curr_cat_arr[j]);
+            ctx.lineTo(x_axis_height - ((10*curr_cat_arr.length)-(j*10)),y_axis_height - (y_axis_multiplier *  curr_cat_arr[j]));
         }
         ctx.stroke();
+        ctx.fillText(categories[n],50 + n*100,y_axis_height+40);
+        n+=1;
     }
+    ctx.linewidth=2;
+    ctx.strokeStyle = '#000000';
+    ctx.fillStyle = '#ff0000';
 }
 
 function new_category(){
