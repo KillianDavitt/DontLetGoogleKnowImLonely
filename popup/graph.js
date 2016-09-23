@@ -193,6 +193,12 @@ function new_category(){
     // Add to the list of categories and store new list back
     categories.push(category_name);
     localStorage.setItem("categories", JSON.stringify(categories));
+    input_box = document.getElementById("new_category")
+    input_box.value = ""
+    ok_mesg = document.createElement('div');
+    ok_mesg.innerHTML = "<p class=\"success\"><b>New category created</b></p>";
+    input_box.parentNode.appendChild(ok_mesg);
+
 }
 
 function draw_point(x,y, mult){

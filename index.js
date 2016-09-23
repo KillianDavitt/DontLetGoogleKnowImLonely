@@ -1,3 +1,16 @@
+/*
+    this is the script which runs on the individual google pages. 
+    It gets the ads on the current page and adds the suggested category as well as adding a select box to each ad allowing the user to add an ad to a category.
+
+    Note that a certain amount of communication has to be done between this script and background.js.
+    since index.js only has access to the localStorage for the current  webpage and not the addons localStorage, we must retrieve the categories list from background.js
+
+    Then, when the user adds an ad to a category, index.js must communicate this back to background.js with the full text of the ad.
+*/
+
+
+/// Bug here, can't get this function to reliably call on the page load and effectively retrieve the ads every time.
+/// There is no recognisable pattern to when it does and doesn't work.
 console.log(document.readyState);
 if(document.readyState == 'complete') {
     console.log("Calling main...");
@@ -9,55 +22,65 @@ window.addEventListener("load", main, false);
 
 function main(){
 
-// Fetch URL of the page
-var page_url = window.location.href;
-/**/console.log("Add-on loaded...\n\n\n");
+    // Fetch URL of the page
+    var page_url = window.location.href;
+    /**/console.log("Add-on loaded...\n\n\n");
 
-// Execute only on Google pages
-if (page_url.indexOf("google") != -1) {
-    document.body.style.border = "2px solid red";
-    console.log("Page is a google page...");
-    
+    // Execute only on Google pages
+    if (page_url.indexOf("google") != -1) {
+        document.body.style.border = "2px solid red";
+        console.log("Page is a google page...");
+        
 
 
-    chrome.runtime.onMessage.addListener(
-        function(request, sender, sendResponse){
-            if(request.subject == "categories"){
-                chrome.runtime.onMessage.removeListener(this);
-                
-                ads = document.getElementsByClassName("ads-ad");
-                console.log(ads.length);
-                categories = JSON.parse(request.categories);
-                for (var i=0; i<ads.length; i++){
-                    console.log("Ad");
-                    var s = '<select><option value="null">Select a Category</option>'; // HTML string
-                    for(var j=0; j<categories.length; j++){
-                        s += '<option value="';
-                        s += categories[j];
-                        s += '">';
-                        s += categories[j];
-                        s += '</option>';
-                    }    
+        chrome.runtime.onMessage.addListener(
+            function(request, sender, sendResponse){
+                if(request.subject == "categories"){
+                    chrome.runtime.onMessage.removeListener(this);
                     
-                    s += "</select>";
-                    var btn = '<button class="category_add_button">Add to Category</button>'
-                    var div = document.createElement('div');
-                    div.innerHTML = s;
-                    ads[i].appendChild(div.childNodes[0]);
-                    div.innerHTML = btn
-                    ads[i].appendChild(div.childNodes[0]);
+                    ads = document.getElementsByClassName("ads-ad");
+                    console.log(ads.length);
+                    categories = JSON.parse(request.categories);
+                    for (var i=0; i<ads.length; i++){
+                        console.log("Ad");
+                        var s = '<select><option value="null">Select a Category</option>'; // HTML string
+                        for(var j=0; j<categories.length; j++){
+                            s += '<option value="';
+                            s += categories[j];
+                            s += '">';
+                            s += categories[j];
+                            s += '</option>';
+                        }    
+                        
+                        s += "</select>";
+                        var btn = '<button class="category_add_button">Add to Category</button>'
+                        var div = document.createElement('div');
+                        div.innerHTML = s;
+                        ads[i].appendChild(div.childNodes[0]);
+                        div.innerHTML = btn
+                        ads[i].appendChild(div.childNodes[0]);
 
-                    button = div.childNodes[0];
-                    //button.onclick=add_ad();
-                    ads[i].childNodes[ads[i].childNodes.length-1].onclick = add_ad;
+                        button = div.childNodes[0];
+                        //button.onclick=add_ad();
+                        ads[i].childNodes[ads[i].childNodes.length-1].onclick = add_ad;
 
+                        suspected = document.createElement('div');
+                        suspected.innerHTML = get_suspect_category(ads[i])
+
+                        ads[i].appendChild(suspected);
+
+                    }
                 }
-            }
-        });
+            });
 
         chrome.runtime.sendMessage(message={subject:"request_categories"}) ;
 	}
 }
+
+function get_suspect_ad(ad){
+    
+}
+
 function add_ad(){
     console.log("Adding ad");
     console.log(this.previousSibling.selectedIndex);
@@ -74,6 +97,11 @@ function add_ad(){
     keywords = processAds([elem])
     chrome.runtime.sendMessage(message={subject:"add_training_data", label: name_of_category, keywords: keywords});
     console.log("+" + name_of_category + "::" + keywords);
+
+    ok_mesg = document.createElement('div');
+    ok_mesg.innerHTML = "Ad added to category successfully";
+    select.parentElement.append(ok_mesg);
+
 }
 
 
