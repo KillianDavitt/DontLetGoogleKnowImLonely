@@ -41,6 +41,7 @@ function message_recv(message){
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {subject: "categories", categories: JSON.stringify(categories)});
         });
+        return;
     }
     else if (message.subject == 'get_pri'){
         chrome.runtime.sendMessage(message={subject:'pri_history', pri_history : JSON.stringify(pri_history)});

@@ -3,7 +3,7 @@
     There is also functionality to export all of the data as well as adding new categories
 */
 
-var colors = ['#ffd700', '#0000ff', '#800080','#00ff00', '#81d8d0'];
+var colors = ['#ffd700', '#0000ff', '#800080','#00ff00', '#81d8d0', '#990000', '#191970', '#8a2be2', '#4169e1'];
 
 
 var pri_history = {};
@@ -11,7 +11,7 @@ var x_axis_height = 600;
 var y_axis_height = 300;
 
 // Pri history is a dict of arrays, containing the pri's for a given time for each category.
-categories = JSON.parse(localStorage.getItem("categories"));
+var categories = JSON.parse(localStorage.getItem("categories"));
 
 if(categories === null){
     categories = JSON.parse("[]");
@@ -68,7 +68,7 @@ function get_min(arr){
 }
 
 function get_y_axis_multiplier(pri_history, y_axis_height){
-    var pri_range =0;
+    var pri_range = 0;
     var max_pri=0;
     if(true || pri_history === null){
         return y_axis_height / 2 ;
@@ -137,7 +137,7 @@ function addPri(time, pri){
     redraw_graph();
 }
 
-function redraw_graph(pri_history){
+function redraw_graph(){
     
     document.getElementById('export_button').onclick = fetch_data;
     document.getElementById('new_category_button').onclick = new_category;
@@ -152,13 +152,15 @@ function redraw_graph(pri_history){
 
     // For all categories
     n=0;
+    cat_n = 0;
+    category_y_offset = 0;
     for(var key in pri_history){
         
         curr_cat_arr = pri_history[key];
             //}
         // For all pri's in that category
         ctx.strokeStyle = colors[n];
-        ctx.fillStyle = colors[n];
+        ctx.fillStyle = colors[cat_n];
         ctx.lineWidth=5;
         
 
@@ -171,8 +173,13 @@ function redraw_graph(pri_history){
             ctx.lineTo(x_axis_height - ((10*curr_cat_arr.length)-(j*10)),y_axis_height - (y_axis_multiplier *  curr_cat_arr[j]));
         }
         ctx.stroke();
-        ctx.fillText(categories[n],50 + n*100,y_axis_height+40);
+        if(50 + n*120 > x_axis_height){
+            n=0;
+            category_y_offset += 19;
+        }
+        ctx.fillText(categories[cat_n],50 + n*120,y_axis_height+40 + category_y_offset);
         n+=1;
+        cat_n +=1;
     }
     ctx.linewidth=2;
     ctx.strokeStyle = '#000000';
@@ -184,20 +191,22 @@ function new_category(){
     category_name = document.getElementById("new_category").value;
 
     // Grab categories from localStorage
-    categories = JSON.parse(localStorage.getItem("categories"));
+    loaded_categories = JSON.parse(localStorage.getItem("categories"));
 
     if(categories === null){
         categories = [];
     }
 
     // Add to the list of categories and store new list back
-    categories.push(category_name);
-    localStorage.setItem("categories", JSON.stringify(categories));
+    loaded_categories.push(category_name);
+    localStorage.setItem("categories", JSON.stringify(loaded_categories));
     input_box = document.getElementById("new_category")
     input_box.value = ""
     ok_mesg = document.createElement('div');
     ok_mesg.innerHTML = "<p class=\"success\"><b>New category created</b></p>";
     input_box.parentNode.appendChild(ok_mesg);
+    categories.push(category_name);
+    pri_history[category_name] = [];
 
 }
 

@@ -8,17 +8,12 @@
     Then, when the user adds an ad to a category, index.js must communicate this back to background.js with the full text of the ad.
 */
 
+var intervalId = setInterval(function() { main();}, 1000);
 
 /// Bug here, can't get this function to reliably call on the page load and effectively retrieve the ads every time.
 /// There is no recognisable pattern to when it does and doesn't work.
 console.log(document.readyState);
-if(document.readyState == 'complete') {
-    console.log("Calling main...");
-    main();
-}
 
-
-window.addEventListener("load", main, false);
 
 function main(){
 
@@ -40,6 +35,9 @@ function main(){
                     
                     ads = document.getElementsByClassName("ads-ad");
                     console.log(ads.length);
+                    if(ads.length > 0){
+                        clearInterval(intervalId);
+                    }
                     categories = JSON.parse(request.categories);
                     for (var i=0; i<ads.length; i++){
                         console.log("Ad");
@@ -65,7 +63,7 @@ function main(){
                         ads[i].childNodes[ads[i].childNodes.length-1].onclick = add_ad;
 
                         suspected = document.createElement('div');
-                        suspected.innerHTML = get_suspect_category(ads[i])
+                        suspected.innerHTML = "<b>Suggested Category</b>: Cancer";//get_suspect_category(ads[i])
 
                         ads[i].appendChild(suspected);
 
@@ -100,8 +98,9 @@ function add_ad(){
 
     ok_mesg = document.createElement('div');
     ok_mesg.innerHTML = "Ad added to category successfully";
-    select.parentElement.append(ok_mesg);
+    select.parentElement.appendChild(ok_mesg);
 
 }
 
+//setInterval( function(){ console.log("Hi")clearInterval(intervalId), 8100);
 

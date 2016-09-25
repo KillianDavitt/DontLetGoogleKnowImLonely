@@ -31,7 +31,8 @@
   "content_scripts": [
     {
       "matches": ["*://*.google.com/*", "*://*.google.ie/*"],
-      "js": ["script.js","index.js"]
+      "js": ["script.js","index.js"],
+      "run_at":    "document_end"
     }
   ]
 
