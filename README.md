@@ -9,17 +9,12 @@ Continuing to develop the code started by: [Cristiano](https://github.com/guimar
 ## TODO
 
 - [x] Make probe queries function in the background
-- [ ] Provide the data to the user in a sensible manner
-- [ ] Make the sensetive/non sensitive bits work
+- [x] Provide the data to the user in a sensible manner
 - [x] Allow export of results data
 - [x] Allow new categories
-- [ ] Create multiple lines on the graph, one for each category
-- [ ] Show suggested labels on ads
-
-# Estimation
-- 3 days for export, finished by thursday evening
-- rest of time for working with categories and such
-
+- [x] Create multiple lines on the graph, one for each category
+- [-] Show suggested labels on ads
+- [ ] Fix training issues with extra categories
 
 ## Timeline
 
