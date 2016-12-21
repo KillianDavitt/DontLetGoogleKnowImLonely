@@ -184,7 +184,7 @@ function redraw_graph(){
     ctx.linewidth=2;
     ctx.strokeStyle = '#000000';
     ctx.fillStyle = '#ff0000';
-}
+    }
 
 function new_category(){
     // Grab category name from form

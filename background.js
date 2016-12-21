@@ -4,8 +4,9 @@
     Lots of communication with both the browser action and the content script happens here.
 */
 
+// Check if any categories are 
 
-// When we load the addon, do the training
+// When we load the addon, do the training 
 training();
 
 // Pri history is a dict of arrays, containing the pri's for a given time for each category.

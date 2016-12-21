@@ -1,7 +1,6 @@
 // Global variables
 var keywords = [];
-//var labels = JSON.parse(localStorage.getItem('categories'));
-var labels = ["sensitive", "other"];
+var labels = JSON.parse(localStorage.getItem('categories'));
 
 var count_matrix = [];
 var training_data = [];
@@ -16,13 +15,13 @@ var training_data = [];
  * @param  {Boolean} first_training  Indicates if this is the first time training
  *                                   is performed; defaults to true.
  */
-function training(first_training = true) {
-    /**/console.log("function training...\n");
-    if (first_training) {
-        //localStorage.clear();
+function training() {
+    data = localStorage.getItem("training_data");
+    if(data === null){
         localStorage.setItem("training_data", training_data_str);
         training_data_str = training_data_str;
-    } else {
+    } 
+    else {
         training_data_str = localStorage.getItem("training_data");
     }
     // Split the training data into individual ads with a label and some text
@@ -92,6 +91,7 @@ function splitTrainingData(training_data) {
  * @param {Array}  ad_txt  Array containing the advert text.
  * @param {String} label   Advert label.
  */
+var new_ad_counter = 0;
 function addTrainingData(ad_txt, label) {
     var ad_data = label + ':: ' + ad_txt.join(' ') + ';';
     
@@ -100,8 +100,11 @@ function addTrainingData(ad_txt, label) {
     var new_training = old_training + ad_data;
     localStorage.setItem("training_data", new_training);
     // Redo training
-    training(false);
-    // TODO: maybe add a counter to do training again only after adding 'n' new ads
+    new_ad_counter += 1;
+    if(new_ad_counter >= 5){
+        training();
+        new_ad_counter = 0;
+    }
 }
 /**
  * Creates a list of unique keywords appearing in the adverts.
@@ -203,11 +206,12 @@ function updateCountMatrix(keyword, label) {
 function getAdLabel(ad) {
     // TODO: change labels
     // Use random condition
-    if (ad[1].length % 2) {
+    return ad[0]
+    /*if (ad[1].length % 2) {
         return "sensitive";
     } else {
         return "other";
-    }
+    }*/
     // Use "location" as a non-sensitive topic
     // return (ad[0] == "location")?"other":"sensitive";
 }
