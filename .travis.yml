@@ -1,0 +1,10 @@
+sudo: required
+dist: trusty
+language: generic
+
+install:
+  - sudo apt-get update
+  - sudo ./install.sh
+
+script:
+  - ./test.sh
